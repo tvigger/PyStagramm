@@ -67,9 +67,11 @@ def register():
         f = form.picture.data
         if not f:
             shutil.copy2('static/img/unknown_avatar_original.png', f'users_images/{user.id}')
-            os.rename(f'users_images/{user.id}/unknown_avatar_original.png', f'users_images/{user.id}/avatar_original.png')
+            os.rename(f'users_images/{user.id}/unknown_avatar_original.png',
+                      f'users_images/{user.id}/avatar_original.png')
             shutil.copy2('static/img/unknown_avatar_scaled_micro.png', f'users_images/{user.id}')
-            os.rename(f'users_images/{user.id}/unknown_avatar_scaled_micro.png', f'users_images/{user.id}/avatar_scaled_micro.png')
+            os.rename(f'users_images/{user.id}/unknown_avatar_scaled_micro.png',
+                      f'users_images/{user.id}/avatar_scaled_micro.png')
         else:
             f.save(f'users_images/{user.id}/avatar_original.png')
             new_f = Image.open(f)
