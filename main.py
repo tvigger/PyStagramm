@@ -63,20 +63,18 @@ def register():
         db_sess.add(user)
         db_sess.commit()
 
-        os.mkdir(f'users_images/{user.id}')
+        os.mkdir(f'static/img/users_images/{user.id}')
         f = form.picture.data
         if not f:
-            shutil.copy2('static/img/unknown_avatar_original.png', f'users_images/{user.id}')
-            os.rename(f'users_images/{user.id}/unknown_avatar_original.png',
-                      f'users_images/{user.id}/avatar_original.png')
-            shutil.copy2('static/img/unknown_avatar_scaled_micro.png', f'users_images/{user.id}')
-            os.rename(f'users_images/{user.id}/unknown_avatar_scaled_micro.png',
-                      f'users_images/{user.id}/avatar_scaled_micro.png')
+            shutil.copy2('static/img/unknown_avatar_original.png', f'static/img/users_images/{user.id}')
+            os.rename(f'static/img/users_images/{user.id}/unknown_avatar_original.png', f'static/img/users_images/{user.id}/avatar_original.png')
+            shutil.copy2('static/img/unknown_avatar_scaled_micro.png', f'static/img/users_images/{user.id}')
+            os.rename(f'static/img/users_images/{user.id}/unknown_avatar_scaled_micro.png', f'static/img/users_images/{user.id}/avatar_scaled_micro.png')
         else:
-            f.save(f'users_images/{user.id}/avatar_original.png')
+            f.save(f'static/img/users_images/{user.id}/avatar_original.png')
             new_f = Image.open(f)
             resized_new_f = new_f.resize((30, 30))
-            resized_new_f.save(f'users_images/{user.id}/avatar_scaled_micro.png')
+            resized_new_f.save(f'static/img/users_images/{user.id}/avatar_scaled_micro.png')
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form)
 
