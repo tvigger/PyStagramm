@@ -99,21 +99,22 @@ def create_post():
     form = PostForm()
     if current_user.is_authenticated:
         if form.validate_on_submit():
-            db_sess = db_session.create_session()
-            post = Post(
-                title=form.title.data,
-                text=form.text.data,
-                owner=current_user.id,
-                likes=0
-            )
-            db_sess.add(post)
-            db_sess.commit()
-            imgs = request.files.getlist(form.imgs.name)
-            if imgs:
-                os.mkdir(f'static/img/posts_images/{post.id}')
-                for i, pic in enumerate(imgs):  # не уверен, что так будет работать, потом уточню
-                    print(pic)
-                    pic.save(f'static/img/posts_images/{post.id}/{i + 1}.{pic.filename.split('.')[-1]}')
+            if current_user.is_authenticated:
+                db_sess = db_session.create_session()
+                post = Post(
+                    title=form.title.data,
+                    text=form.text.data,
+                    owner=current_user.id,
+                    likes=0
+                )
+                db_sess.add(post)
+                db_sess.commit()
+                imgs = request.files.getlist(form.imgs.name)
+                if imgs:
+                    os.mkdir(f'static/img/posts_images/{post.id}')
+                    for i, pic in enumerate(imgs):  # не уверен, что так будет работать, потом уточню
+                        print(pic)
+                        pic.save(f'static/img/posts_images/{post.id}/{i + 1}.{pic.filename.split('.')[-1]}')
             return redirect('/')  # временно, потом будет перекидывать на твой профиль
         return render_template('create_post.html', form=form)
     return render_template('login_required.html', form=form)

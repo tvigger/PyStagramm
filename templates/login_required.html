@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1 style="text-align: center;">Вы не авторизованы!</h1>
-    <form action="">
+    <form action="/">
         {{ form.hidden_tag() }}
-        <button type="submit" class="btn btn-primary">На главную</button>
+        <div style="text-align: center;">
+            <h1>Вы не авторизованы!</h1>
+            <button type="submit" class="btn btn-primary">На главную</button>
+        </div>
     </form>
 {% endblock %}
