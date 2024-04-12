@@ -5,14 +5,14 @@ from wtforms import PasswordField, StringField, SubmitField, EmailField, Boolean
 from wtforms.validators import DataRequired, Length
 from werkzeug.security import generate_password_hash, check_password_hash
 
-images = UploadSet('images', IMAGES)
+user_images = UploadSet('images', IMAGES)
 
 
 class RegisterForm(FlaskForm):
     name = StringField('Имя', validators=[DataRequired()])
     surname = StringField('Фамилия')
     nickname = StringField('Псевдоним', validators=[DataRequired(), Length(min=4, max=100)])
-    picture = FileField('Фотография профиля', validators=[FileAllowed(images, 'wrong')])
+    picture = FileField('Фотография профиля', validators=[FileAllowed(user_images, 'wrong')])
     about = TextAreaField('О себе')
     email = EmailField('Адрес электронной почты', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])

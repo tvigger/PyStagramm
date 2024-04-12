@@ -2,7 +2,7 @@
 
 {% block content %}
     <h1 style="text-align: center;">Авторизация</h1>
-    <form action="" method="post">
+    <form action="" method="post" novalidate> <!--novalidate в учебнике советует писать-->
         {{ form.hidden_tag() }}
         <p class="form">
             {{ form.email.label }}<br>

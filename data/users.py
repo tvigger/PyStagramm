@@ -1,6 +1,6 @@
 import datetime
-
 import sqlalchemy
+from sqlalchemy import orm
 from werkzeug.security import generate_password_hash, check_password_hash
 from data.db_session import SqlAlchemyBase
 from flask_login import UserMixin
@@ -22,9 +22,10 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     following = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
+    publications = orm.relationship('Post', back_populates='user')
 
     def __repr__(self):
-        return f'<Colonist> {self.id} {self.name}'
+        return f'<User> {self.id} {self.name}'
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
