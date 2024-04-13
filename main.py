@@ -1,5 +1,4 @@
 import datetime
-
 from flask_uploads import configure_uploads
 from PIL import Image
 from data import db_session
@@ -9,6 +8,7 @@ from forms.user import LoginForm, RegisterForm
 from data.posts import Post
 from forms.post import post_images
 from forms.post import PostForm
+from forms.login_required import LogReqForm
 from flask import Flask, render_template, redirect, request, make_response, jsonify
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_restful import reqparse, abort, Api, Resource
@@ -31,7 +31,9 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
-    return render_template('base.html', title='Лента')
+    db_sess = db_session.create_session()
+    posts = db_sess.query(Post).all()
+    return render_template('index.html', title='Лента', posts=posts)
 
 
 @app.route('/logout')
@@ -68,16 +70,17 @@ def register():
         f = form.picture.data
         if not f:
             shutil.copy2('static/img/unknown_avatar_original.png', f'static/img/users_images/{user.id}')
-            os.rename(f'static/img/users_images/{user.id}/unknown_avatar_original.png', f'static/img/users_images/{user.id}/avatar_original.png')
+            os.rename(f'static/img/users_images/{user.id}/unknown_avatar_original.png',
+                      f'static/img/users_images/{user.id}/avatar_original.png')
             shutil.copy2('static/img/unknown_avatar_scaled_micro.png', f'static/img/users_images/{user.id}')
-            os.rename(f'static/img/users_images/{user.id}/unknown_avatar_scaled_micro.png', f'static/img/users_images/{user.id}/avatar_scaled_micro.png')
+            os.rename(f'static/img/users_images/{user.id}/unknown_avatar_scaled_micro.png',
+                      f'static/img/users_images/{user.id}/avatar_scaled_micro.png')
         else:
-            print(f)  # на снос
             f.save(f'static/img/users_images/{user.id}/avatar_original.png')
             new_f = Image.open(f)
             resized_new_f = new_f.resize((30, 30))
             resized_new_f.save(f'static/img/users_images/{user.id}/avatar_scaled_micro.png')
-        return redirect('/login')
+        return redirect('/')  # пока что убрал перенаправление на логин т.к. она сразу логинит
     return render_template('register.html', title='Регистрация', form=form)
 
 
@@ -96,8 +99,8 @@ def login():
 
 @app.route('/create_post', methods=['GET', 'POST'])  # создаю запись на стене
 def create_post():
-    form = PostForm()
     if current_user.is_authenticated:
+        form = PostForm()
         if form.validate_on_submit():
             if current_user.is_authenticated:
                 db_sess = db_session.create_session()
@@ -112,12 +115,31 @@ def create_post():
                 imgs = request.files.getlist(form.imgs.name)
                 if imgs:
                     os.mkdir(f'static/img/posts_images/{post.id}')
-                    for i, pic in enumerate(imgs):  # не уверен, что так будет работать, потом уточню
-                        print(pic)
-                        pic.save(f'static/img/posts_images/{post.id}/{i + 1}.{pic.filename.split('.')[-1]}')
+                    for i, pic in enumerate(imgs):
+                        pic.save(f'static/img/posts_images/{post.id}/{i + 1}.png')
             return redirect('/')  # временно, потом будет перекидывать на твой профиль
-        return render_template('create_post.html', form=form)
-    return render_template('login_required.html', form=form)
+        return render_template('create_post.html', form=form, title='Создание публикации')
+    else:
+        form = LogReqForm()
+        if form.validate_on_submit():
+            return redirect('/')
+        return render_template('login_required.html', form=form)
+
+
+@app.route('/<nickname>', methods=['GET', 'POST'])
+def profile(nickname):
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.nickname == nickname).first()
+    if user:
+        posts = db_sess.query(Post).filter(Post.user == user).all()
+        return render_template('profile.html', user=user, posts=posts, title=user.nickname)
+    else:
+        abort(404)
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(jsonify({'error': 'Not found'}), 404)
 
 
 def main():

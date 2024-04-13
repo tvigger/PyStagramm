@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>Профиль пользователя {{ user.nickname}}<img src="../static/img/users_images/{{user.id}}/avatar_scaled_micro.png"></h3>
+Обо мне: {{ user.about }}
+{% if posts %}
+    <h4 style="text-align:center;">Публикации</h4>
+    {% for item in posts%}
+    <div class="col-md6 border rounded">
+        <a href="/{{item.user.nickname}}"><img src="../static/img/users_images/{{item.user.id}}/avatar_scaled_micro.png">{{item.user.nickname}}</a>
+        <h2 >{{item.title}}</h2>
+        <div>
+            {{item.text}}
+        </div>
+        <p></p>
+        <div>
+            <img width="200" height="200" src="../static/img/posts_images/{{item.id}}/1.png">
+            <img width="200" height="200" src="../static/img/posts_images/{{item.id}}/2.png">
+        </div>
+        <p></p>
+        <div>
+            Дата публикации - {{item.publ_date}}
+        </div>
+        <p></p>
+    </div>
+    <p></p>
+    {% endfor %}
+{% else %}
+    <h2 style="text-align:center;">Похоже, тут пока ничего нет</h2>
+{% endif %}
+{% endblock %}
