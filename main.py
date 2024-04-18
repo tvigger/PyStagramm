@@ -3,24 +3,31 @@ from flask_uploads import configure_uploads
 from PIL import Image
 from data import db_session
 from data.users import User
-from forms.user import user_images
-from forms.user import LoginForm, RegisterForm
+from forms.user import user_images, LoginForm, RegisterForm
 from data.posts import Post
-from forms.post import post_images
-from forms.post import PostForm
+from forms.post import PostForm, post_images
 from forms.login_required import LogReqForm
 from flask import Flask, render_template, redirect, request, make_response, jsonify
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from flask_restful import reqparse, abort, Api, Resource
+from flask_restful import abort, Api
 import os
 import shutil
+from data.post_resourses import PostResource, PostsListResource
 
 app = Flask(__name__)
+api = Api(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['UPLOADED_IMAGES_DEST'] = '/users_images'
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 configure_uploads(app, (user_images,))
+
+
+def main():
+    db_session.global_init("db/pystagramm.db")
+    api.add_resource(PostsListResource, '/api/posts')
+    api.add_resource(PostResource, '/api/posts/<int:post_id>')
+    app.run()
 
 
 @login_manager.user_loader
@@ -140,11 +147,6 @@ def profile(nickname):
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
-
-
-def main():
-    db_session.global_init("db/pystagramm.db")
-    app.run()
 
 
 if __name__ == '__main__':
