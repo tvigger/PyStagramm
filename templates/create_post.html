@@ -2,7 +2,7 @@
 
 {% block content %}
     <h1 style="text-align:center;">Создание публикации</h1>
-    <form action="" method="post" enctype="multipart/form-data"> <!--novalidate в учебнике советует писать-->
+    <form action="" method="post" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <p class="form">
             {{ form.title.label }}<br>
@@ -30,7 +30,7 @@
                 {{ error }}
             </p>
         {% endfor %}
-    </p>
+        </p>
         <p class="form">{{ form.submit(type="submit", class="btn btn-primary") }}</p>
         <div>{{ message }}</div>
     </form>

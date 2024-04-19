@@ -11,13 +11,16 @@
     </div>
     <p></p>
     <div>
-        <img width="200" height="200" src="../static/img/posts_images/{{item.id}}/1.png">
-        <img width="200" height="200" src="../static/img/posts_images/{{item.id}}/2.png">
+        {% for j in range(item.img_amount) %}
+            <img width="400" height="400" src="../static/img/posts_images/{{item.id}}/{{j + 1}}.png">
+        {% endfor %}
     </div>
     <p></p>
     <div>
         Дата публикации - {{item.publ_date}}
     </div>
+    <p></p>
+    <a href="/posts/{{item.id}}">Комментарии</a>
     <p></p>
 </div>
 <p></p>

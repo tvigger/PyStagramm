@@ -6,7 +6,9 @@ from data.users import User
 from forms.user import user_images, LoginForm, RegisterForm
 from data.posts import Post
 from forms.post import PostForm, post_images
+from data.comments import Comment
 from forms.login_required import LogReqForm
+from forms.comment import CommentForm
 from flask import Flask, render_template, redirect, request, make_response, jsonify
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_restful import abort, Api
@@ -87,7 +89,7 @@ def register():
             new_f = Image.open(f)
             resized_new_f = new_f.resize((30, 30))
             resized_new_f.save(f'static/img/users_images/{user.id}/avatar_scaled_micro.png')
-        return redirect('/')  # пока что убрал перенаправление на логин т.к. она сразу логинит
+        return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form)
 
 
@@ -109,22 +111,24 @@ def create_post():
     if current_user.is_authenticated:
         form = PostForm()
         if form.validate_on_submit():
-            if current_user.is_authenticated:
-                db_sess = db_session.create_session()
-                post = Post(
-                    title=form.title.data,
-                    text=form.text.data,
-                    owner=current_user.id,
-                    likes=0
-                )
-                db_sess.add(post)
-                db_sess.commit()
-                imgs = request.files.getlist(form.imgs.name)
-                if imgs:
-                    os.mkdir(f'static/img/posts_images/{post.id}')
-                    for i, pic in enumerate(imgs):
-                        pic.save(f'static/img/posts_images/{post.id}/{i + 1}.png')
-            return redirect('/')  # временно, потом будет перекидывать на твой профиль
+            db_sess = db_session.create_session()
+            post = Post(
+                title=form.title.data,
+                text=form.text.data,
+                owner=current_user.id
+            )
+            db_sess.add(post)
+            db_sess.commit()
+            imgs = request.files.getlist(form.imgs.name)
+            c = 0
+            if imgs:
+                os.mkdir(f'static/img/posts_images/{post.id}')
+                for i, pic in enumerate(imgs):
+                    pic.save(f'static/img/posts_images/{post.id}/{i + 1}.png')
+                    c += 1
+            post.img_amount = c
+            db_sess.commit()
+            return redirect(f'/{current_user.nickname}')
         return render_template('create_post.html', form=form, title='Создание публикации')
     else:
         form = LogReqForm()
@@ -142,6 +146,25 @@ def profile(nickname):
         return render_template('profile.html', user=user, posts=posts, title=user.nickname)
     else:
         abort(404)
+
+
+@app.route('/posts/<int:post_id>', methods=['GET', 'POST'])
+def post(post_id):
+    form = CommentForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        comment = Comment(
+            under=post_id,
+            publisher=current_user.id,
+            text=form.text.data
+        )
+        db_sess.add(comment)
+        db_sess.commit()
+        return redirect(f'/posts/{post_id}')
+    db_sess = db_session.create_session()
+    post = db_sess.query(Post).filter(Post.id == post_id).first()
+    comments = db_sess.query(Comment).filter(Comment.under == post_id).order_by(-Comment.id)
+    return render_template('post.html', post=post, comments=comments, form=form)
 
 
 @app.errorhandler(404)

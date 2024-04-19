@@ -23,6 +23,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     publications = orm.relationship('Post', back_populates='user')
+    comments = orm.relationship('Comment', back_populates='user')
 
     def __repr__(self):
         return f'<User> {self.id} {self.name}'

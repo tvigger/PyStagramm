@@ -6,16 +6,15 @@ from flask_login import UserMixin
 from sqlalchemy_serializer import SerializerMixin
 
 
-class Post(SqlAlchemyBase, UserMixin, SerializerMixin):
-    __tablename__ = 'posts'
+class Comment(SqlAlchemyBase, UserMixin, SerializerMixin):
+    __tablename__ = 'comments'
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    owner = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))
+    under = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('posts.id'))
+    publisher = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))
     publ_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
-    img_amount = sqlalchemy.Column(sqlalchemy.Integer, default=0)
-    title = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     text = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    post = orm.relationship('Post')
     user = orm.relationship('User')
-    comment = orm.relationship('Comment', back_populates='post')
 
     def __repr__(self):
-        return f'<post> {self.id} {self.title}'
+        return f'<comment> {self.id} {self.text}'

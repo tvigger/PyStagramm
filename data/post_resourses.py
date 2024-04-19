@@ -3,6 +3,7 @@ from flask_restful import abort, Resource
 from data import db_session
 from data.posts import Post
 from data.reqparse import post_parser
+import os
 
 fields = ('id', 'owner', 'publ_date', 'likes', 'title', 'text')
 
@@ -26,6 +27,7 @@ class PostResource(Resource):
         session = db_session.create_session()
         post = session.query(Post).get(post_id)
         session.delete(post)
+        os.rmdir('static/img/posts_images/{post.id}')
         session.commit()
         return jsonify({'success': 'OK'})
 
