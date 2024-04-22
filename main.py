@@ -1,20 +1,26 @@
 import datetime
-from flask_uploads import configure_uploads
-from PIL import Image
-from data import db_session
-from data.users import User
-from forms.user import user_images, LoginForm, RegisterForm
-from data.posts import Post
-from forms.post import PostForm, post_images
-from data.comments import Comment
-from forms.login_required import LogReqForm
-from forms.comment import CommentForm
+
 from flask import Flask, render_template, redirect, request, make_response, jsonify
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_restful import abort, Api
+from flask_uploads import configure_uploads
+
+from PIL import Image
+
+from data import db_session
+from data.users import User
+from data.posts import Post
+from data.comments import Comment
+from data.post_resourses import PostResource, PostsListResource
+from data.user_resourses import UsersResource, UsersListResource
+
+from forms.user import user_images, LoginForm, RegisterForm
+from forms.post import PostForm, post_images
+from forms.login_required import LogReqForm
+from forms.comment import CommentForm
+
 import os
 import shutil
-from data.post_resourses import PostResource, PostsListResource
 
 app = Flask(__name__)
 api = Api(app)
@@ -29,6 +35,8 @@ def main():
     db_session.global_init("db/pystagramm.db")
     api.add_resource(PostsListResource, '/api/posts')
     api.add_resource(PostResource, '/api/posts/<int:post_id>')
+    api.add_resource(UsersResource, '/api/users/<int:user_id>')
+    api.add_resource(UsersListResource, '/api/users')
     app.run()
 
 

@@ -1,11 +1,13 @@
 from flask import jsonify
 from flask_restful import abort, Resource
+
 from data import db_session
 from data.posts import Post
 from data.reqparse import post_parser
+
 import os
 
-fields = ('id', 'owner', 'publ_date', 'likes', 'title', 'text')
+fields = ('id', 'owner', 'publ_date', 'title', 'text')
 
 
 def abort_if_job_not_found(post_id):

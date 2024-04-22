@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed
 from flask_uploads import UploadSet, IMAGES
+
 from wtforms import StringField, SubmitField, TextAreaField, MultipleFileField
 from wtforms.validators import DataRequired, Length
 
