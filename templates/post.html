@@ -4,23 +4,26 @@
 <h4 style="text-align:center;">Публикации</h4>
 <div class="col-md6 border rounded">
     <a href="/{{post.user.nickname}}"><img src="../static/img/users_images/{{post.user.id}}/avatar_scaled_micro.png">{{post.user.nickname}}</a>
-    <p></p>
-    <div>
-        Дата публикации - {{post.publ_date}}
-    </div>
-    <p></p>
-    <h2 >{{post.title}}</h2>
-    <div>
-        {{post.text}}
-    </div>
-    <p></p>
-    <div>
-        {% for j in range(post.img_amount) %}
-            <img width="400" height="400" src="../static/img/posts_images/{{post.id}}/{{j + 1}}.png">
-        {% endfor %}
-    </div>
-    <p></p>
-    <h2>Комментарии</h2>
+        <h2 >{{post.title}}</h2>
+        <div>
+            <h3>{{post.text}}</h3>
+        </div>
+        <p></p>
+        <div>
+            {% for j in range(post.img_amount) %}
+                <img width="400" height="400" src="../static/img/posts_images/{{post.id}}/{{j + 1}}.png">
+            {% endfor %}
+        </div>
+        <p></p>
+        {% if current_user.id == post.owner %}
+            <a href="/delete_post/{{post.id}}" class="btb btn-primary">Удалить новость</a>
+            <p></p>
+        {% endif %}
+        <div>
+            Дата публикации - {{post.publ_date}}
+        </div>
+        <p></p>
+    <h2>Комментарии:</h2>
     {% if current_user.is_authenticated %}
     <form action="" method="post" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
@@ -30,6 +33,8 @@
         </p>
         <p class="form" style="margin-left:0">{{ form.submit(type="submit", class="btn btn-primary") }}</p>
     </form>
+    {% else %}
+        <h4 style="text-align:center;">Для публикации комментария необходима авторизация</h4>
     {% endif %}
     {% for comment in comments%}
     <div>
@@ -39,6 +44,9 @@
         <p></p>
         {{ comment.text }}
         <p></p>
+        {% if comment.publisher == current_user.id %}:
+            <a href="/delete_comment/{{comment.id}}">Удалить комментарий</a>
+        {% endif %}
     </div>
     {% endfor %}
 </div>

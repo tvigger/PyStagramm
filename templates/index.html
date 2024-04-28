@@ -20,6 +20,10 @@
         Дата публикации - {{item.publ_date}}
     </div>
     <p></p>
+    {% if current_user.id == item.owner %}
+        <a href="/delete_post/{{item.id}}" class="btb btn-primary">Удалить новость</a>
+    {% endif %}
+    <p></p>
     <a href="/posts/{{item.id}}">Комментарии</a>
     <p></p>
 </div>

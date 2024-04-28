@@ -6,7 +6,11 @@ from data.posts import Post
 from data.comments import Comment
 from data.reqparse import post_parser
 
+from config import PORT, HOST
+
 import shutil
+
+from requests import delete as d
 
 fields = ('id', 'owner', 'publ_date', 'title', 'text')
 
@@ -29,11 +33,11 @@ class PostResource(Resource):
         abort_if_post_not_found(post_id)
         session = db_session.create_session()
         post = session.query(Post).get(post_id)
-        comments = session.query(Comment).filter(Comment.under == post.id)
+        comments = session.query(Comment).filter(Comment.under == post.id).all()
         for com in comments:
-            session.delete(com)
-        session.delete(post)
+            d(f'http://{HOST}:{PORT}/api/comments/{com.id}')
         shutil.rmtree(f'static/img/posts_images/{post.id}')
+        session.delete(post)
         session.commit()
         return jsonify({'success': 'OK'})
 

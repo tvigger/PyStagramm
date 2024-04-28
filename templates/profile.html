@@ -1,8 +1,27 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h3>Профиль пользователя {{ user.nickname}}<img src="../static/img/users_images/{{user.id}}/avatar_scaled_micro.png"></h3>
-Обо мне: {{ user.about }}
+<h3>Профиль пользователя {{ user.nickname}}</h3>
+<img src="../static/img/users_images/{{user.id}}/avatar_original.png" height="400">
+<p></p>
+<label>Обо мне: {{ user.about }}</label>
+{% if current_user.is_authenticated %}
+    {% if user.id != current_user.id %}
+        {% if current_user.id not in followers%}
+            <form method="post" enctype="multipart/form-data">
+                <a><input type="submit" class="btb btn-primary" value="Подписаться"></a>
+            </form>
+        {% else %}
+            <form method="post" enctype="multipart/form-data">
+                <a><input type="submit" class="btb btn-warning" value="Отписаться"></a>
+            </form>
+        {% endif %}
+    {% else %}
+        <form method="post" enctype="multipart/form-data">
+            <a href="/delete_user/{{current_user.id}}" class="btb btn-danger" type="button">Удалить аккаунт</a>
+        </form>
+    {% endif %}
+{% endif %}
 {% if posts %}
     <h4 style="text-align:center;">Публикации</h4>
     {% for item in posts%}
@@ -10,7 +29,7 @@
         <a href="/{{item.user.nickname}}"><img src="../static/img/users_images/{{item.user.id}}/avatar_scaled_micro.png">{{item.user.nickname}}</a>
         <h2 >{{item.title}}</h2>
         <div>
-            {{item.text}}
+            <h3>{{item.text}}</h3>
         </div>
         <p></p>
         <div>
@@ -22,6 +41,10 @@
         <div>
             Дата публикации - {{item.publ_date}}
         </div>
+        <p></p>
+        {% if current_user.id == item.owner %}
+            <a href="/delete_post/{{item.id}}" class="btb btn-primary" type="button">Удалить новость</a>
+        {% endif %}
         <p></p>
         <a href="/posts/{{item.id}}">Комментарии</a>
         <p></p>

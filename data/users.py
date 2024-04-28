@@ -22,12 +22,12 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     email = sqlalchemy.Column(sqlalchemy.String,
                               index=True, unique=True, nullable=False)
     about = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    followers = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    following = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     publications = orm.relationship('Post', back_populates='user')
     comments = orm.relationship('Comment', back_populates='user')
+    followers = orm.relationship('Subscribe', back_populates='who')
+    following = orm.relationship('Subscribe', back_populates='targ')
 
     def __repr__(self):
         return f'<User> {self.id} {self.name}'

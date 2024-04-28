@@ -4,12 +4,18 @@ from flask_restful import abort, Resource
 from data import db_session
 from data.users import User
 from data.posts import Post
+from data.subscribes import Subscribe
 from data.comments import Comment
 from data.reqparse import user_parser
+
+from config import PORT, HOST
 
 from werkzeug.security import generate_password_hash
 
 import shutil
+
+from requests import delete as d
+
 
 def set_password(password):
     return generate_password_hash(password)
@@ -34,12 +40,15 @@ class UsersResource(Resource):
         abort_if_user_not_found(user_id)
         session = db_session.create_session()
         user = session.query(User).get(user_id)
-        posts = session.query(Post).filter(Post.owner == user.id)
+        posts = session.query(Post).filter(Post.owner == user.id).all()
         for p in posts:
-            comms = session.query(Comment).filter(Comment.under == p.id)
-            for c in comms:
-                session.delete(c)
-            session.delete(p)
+            d(f'http://{HOST}:{PORT}/api/posts/{p.id}')
+        subs = session.query(Subscribe).filter((Subscribe.follower == user_id) | (Subscribe.following == user.id)).all()
+        for s in subs:
+            session.delete(s)
+        comments = session.query(Comment).filter(Comment.publisher == user.id).all()
+        for com in comments:
+            d(f'http://{HOST}:{PORT}/api/comments/{com.id}')
         shutil.rmtree(f'static/img/users_images/{user.id}')
         session.delete(user)
         session.commit()
