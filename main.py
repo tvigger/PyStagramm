@@ -33,6 +33,7 @@ login_manager.init_app(app)
 app.config['UPLOADED_IMAGES_DEST'] = '/users_images'
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 configure_uploads(app, (user_images,))
+forbidden_nicknames = ['register', 'login', 'logout', 'create_post', 'posts']
 
 
 def main():
@@ -75,7 +76,8 @@ def register():
                                    message="Пароли не совпадают")
         db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.email == form.email.data).first()\
-                or db_sess.query(User).filter(User.nickname == form.nickname.data).first():
+                or db_sess.query(User).filter(User.nickname == form.nickname.data).first()\
+                or form.nickname.data in forbidden_nicknames:
             return render_template('register.html', title='Регистрация', form=form,
                                    message="Такой пользователь уже есть")
         user = User(
