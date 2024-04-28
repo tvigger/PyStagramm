@@ -1,0 +1,11 @@
+Flask~=3.0.3
+Flask-Login~=0.6.3
+Flask-RESTful~=0.3.10
+Flask-Reuploaded~=1.4.0
+Flask-Uploads~=0.2.1
+Flask-WTF~=1.2.1
+pillow~=10.3.0
+SQLAlchemy~=2.0.29
+WTForms~=3.1.2
+Sqlalchemy-Serializer~=1.4.12
+requests~=2.31.0

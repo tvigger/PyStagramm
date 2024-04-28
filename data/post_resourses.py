@@ -3,33 +3,37 @@ from flask_restful import abort, Resource
 
 from data import db_session
 from data.posts import Post
+from data.comments import Comment
 from data.reqparse import post_parser
 
-import os
+import shutil
 
 fields = ('id', 'owner', 'publ_date', 'title', 'text')
 
 
-def abort_if_job_not_found(post_id):
+def abort_if_post_not_found(post_id):
     session = db_session.create_session()
-    user = session.query(Post).get(post_id)
-    if not user:
+    post = session.query(Post).get(post_id)
+    if not post:
         abort(404, message=f'Job id:{post_id} not found (╯°□°)╯')
 
 
 class PostResource(Resource):
     def get(self, post_id):
-        abort_if_job_not_found(post_id)
+        abort_if_post_not_found(post_id)
         session = db_session.create_session()
         post = session.query(Post).get(post_id)
         return jsonify({'post': post.to_dict(only=fields)})
 
     def delete(self, post_id):
-        abort_if_job_not_found(post_id)
+        abort_if_post_not_found(post_id)
         session = db_session.create_session()
         post = session.query(Post).get(post_id)
+        comments = session.query(Comment).filter(Comment.under == post.id)
+        for com in comments:
+            session.delete(com)
         session.delete(post)
-        os.rmdir('static/img/posts_images/{post.id}')
+        shutil.rmtree(f'static/img/posts_images/{post.id}')
         session.commit()
         return jsonify({'success': 'OK'})
 
@@ -46,7 +50,6 @@ class PostsListResource(Resource):
         post = Post(
             owner=args['owner'],
             publ_date=args['publ_date'],
-            likes=args['likes'],
             title=args['title'],
             text=args['text'],
         )
