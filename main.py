@@ -13,6 +13,7 @@ from data.posts import Post
 from data.comments import Comment
 from data.post_resourses import PostResource, PostsListResource
 from data.user_resourses import UsersResource, UsersListResource
+from data.comment_resourses import CommentResource, CommentsListResource
 
 from forms.user import user_images, LoginForm, RegisterForm
 from forms.post import PostForm, post_images
@@ -35,8 +36,10 @@ def main():
     db_session.global_init("db/pystagramm.db")
     api.add_resource(PostsListResource, '/api/posts')
     api.add_resource(PostResource, '/api/posts/<int:post_id>')
-    api.add_resource(UsersResource, '/api/users/<int:user_id>')
     api.add_resource(UsersListResource, '/api/users')
+    api.add_resource(UsersResource, '/api/users/<int:user_id>')
+    api.add_resource(CommentsListResource, '/api/comments')
+    api.add_resource(CommentResource, '/api/comments/<int:comment_id>')
     app.run()
 
 

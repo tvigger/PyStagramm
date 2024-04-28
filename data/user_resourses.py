@@ -3,10 +3,13 @@ from flask_restful import abort, Resource
 
 from data import db_session
 from data.users import User
-from data.reqparse_user import parser
+from data.posts import Post
+from data.comments import Comment
+from data.reqparse import user_parser
 
 from werkzeug.security import generate_password_hash
 
+import shutil
 
 def set_password(password):
     return generate_password_hash(password)
@@ -31,6 +34,13 @@ class UsersResource(Resource):
         abort_if_user_not_found(user_id)
         session = db_session.create_session()
         user = session.query(User).get(user_id)
+        posts = session.query(Post).filter(Post.owner == user.id)
+        for p in posts:
+            comms = session.query(Comment).filter(Comment.under == p.id)
+            for c in comms:
+                session.delete(c)
+            session.delete(p)
+        shutil.rmtree(f'static/img/users_images/{user.id}')
         session.delete(user)
         session.commit()
         return jsonify({'success': 'OK'})
@@ -44,7 +54,7 @@ class UsersListResource(Resource):
             only=('name', 'surname', 'nickname', 'about', 'email', 'hashed_password')) for item in users]})
 
     def post(self):
-        args = parser.parse_args()
+        args = user_parser.parse_args()
         session = db_session.create_session()
         users = User(
             name=args['name'],
