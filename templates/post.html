@@ -47,6 +47,7 @@
         {% if comment.publisher == current_user.id %}:
             <a href="/delete_comment/{{comment.id}}">Удалить комментарий</a>
         {% endif %}
+        <p></p>
     </div>
     {% endfor %}
 </div>

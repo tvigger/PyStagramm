@@ -1,27 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h3>Профиль пользователя {{ user.nickname}}</h3>
-<img src="../static/img/users_images/{{user.id}}/avatar_original.png" height="400">
-<p></p>
-<label>Обо мне: {{ user.about }}</label>
-{% if current_user.is_authenticated %}
-    {% if user.id != current_user.id %}
-        {% if current_user.id not in followers%}
-            <form method="post" enctype="multipart/form-data">
-                <a><input type="submit" class="btb btn-primary" value="Подписаться"></a>
-            </form>
+<div class="col-10">
+    <h3>Профиль пользователя {{ user.nickname}}</h3>
+    <img src="../static/img/users_images/{{user.id}}/avatar_original.png" height="400">
+    <p></p>
+    <label>Обо мне: {{ user.about }}</label>
+    {% if current_user.is_authenticated %}
+        {% if user.id != current_user.id %}
+            {% if current_user.id not in followers%}
+                <form method="post" enctype="multipart/form-data">
+                    <a><input type="submit" class="btb btn-primary" value="Подписаться"></a>
+                </form>
+            {% else %}
+                <form method="post" enctype="multipart/form-data">
+                    <a><input type="submit" class="btb btn-warning" value="Отписаться"></a>
+                </form>
+            {% endif %}
         {% else %}
             <form method="post" enctype="multipart/form-data">
-                <a><input type="submit" class="btb btn-warning" value="Отписаться"></a>
+                <a href="/delete_user/{{current_user.id}}" class="btb btn-danger" type="button">Удалить аккаунт</a>
             </form>
         {% endif %}
-    {% else %}
-        <form method="post" enctype="multipart/form-data">
-            <a href="/delete_user/{{current_user.id}}" class="btb btn-danger" type="button">Удалить аккаунт</a>
-        </form>
     {% endif %}
-{% endif %}
+</div>
 {% if posts %}
     <h4 style="text-align:center;">Публикации</h4>
     {% for item in posts%}

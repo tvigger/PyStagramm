@@ -33,7 +33,8 @@ login_manager.init_app(app)
 app.config['UPLOADED_IMAGES_DEST'] = '/users_images'
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 configure_uploads(app, (user_images,))
-forbidden_nicknames = ['register', 'login', 'logout', 'create_post', 'posts']
+forbidden_nicknames = ['register', 'login', 'logout', 'create_post',
+                       'posts', 'delete_user', 'delete_post', 'delete_comment']
 
 
 def main():
